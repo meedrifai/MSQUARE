@@ -8,7 +8,7 @@ export default function Hero() {
   return (
     <section
       id="home"
-      className="min-h-screen flex items-center justify-center bg-gradient-to-br from-orange-50 to-orange-100 dark:from-gray-900 dark:to-gray-800 pt-20"
+      className="min-h-screen flex items-center justify-center bg-linear-to-br from-orange-50 to-orange-100 dark:from-gray-900 dark:to-gray-800 pt-20"
     >
       <div className="container mx-auto px-4 text-center">
         <div className="animate-fade-in">

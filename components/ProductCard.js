@@ -54,7 +54,7 @@ export default function ProductCard({ product }) {
               alt={selectedDesign.name}
               width={128}
               height={128}
-              className="object-contain"
+              className="object-cover rounded-md"
             />
           </div>
         )}
@@ -67,7 +67,7 @@ export default function ProductCard({ product }) {
               alt="Custom design"
               width={128}
               height={128}
-              className="object-contain"
+              className="object-cover rounded-md"
             />
           </div>
         )}
@@ -104,9 +104,9 @@ export default function ProductCard({ product }) {
                 <Image
                   src={design.preview}
                   alt={design.name}
-                  width={40}
-                  height={40}
-                  className="rounded-full object-cover"
+                  width={60}
+                  height={60}
+                  className="rounded-md object-cover"
                 />
               </button>
             ))}

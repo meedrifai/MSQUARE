@@ -3,8 +3,11 @@
 import { useState } from "react";
 import { MessageCircle } from "lucide-react";
 import { useApp } from "@/context/AppContext";
+import Image from "next/image";
+import { useRouter } from "next/navigation";
 
 export default function CheckoutForm({ product }) {
+  const router = useRouter();
   const { t, lang } = useApp();
   const [formData, setFormData] = useState({
     fullName: "",
@@ -40,11 +43,20 @@ export default function CheckoutForm({ product }) {
     if (!validateForm()) return;
 
     const total = product.price * formData.quantity;
-    const message = `Bonjour 👋, je veux commander le produit *${
-      product.name[lang]
-    }*
 
-📦 *Détails du produit:*
+    // Design info
+    let designInfo = "Aucun";
+    if (product.selectedDesign) {
+      designInfo = `${product.selectedDesign.name} (${product.selectedDesign.preview})`;
+    } else if (product.uploadedImage) {
+      designInfo = `Personnalisé (${product.uploadedImage})`;
+    }
+
+    const message = `Bonjour, je souhaite commander le produit *${
+      product.name[lang]
+    }*.
+
+📦 Détails du produit :
 - Taille: ${formData.size}
 - Couleur: ${
       formData.color === "black"
@@ -56,9 +68,10 @@ export default function CheckoutForm({ product }) {
         : "أبيض"
     }
 - Quantité: ${formData.quantity}
+- Design: ${designInfo}
 - Prix total: ${total} DH
 
-👤 *Informations client:*
+👤 Informations client :
 - Nom: ${formData.fullName}
 - Téléphone: ${formData.phone}
 - Adresse: ${formData.address}
@@ -69,6 +82,9 @@ Merci 🙏`;
       message
     )}`;
     window.open(whatsappLink, "_blank");
+
+    // Rediriger vers page de confirmation ou accueil
+    router.push("/"); // ou "/confirmation" éventuelement
   };
 
   const total = product.price * formData.quantity;
@@ -79,11 +95,13 @@ Merci 🙏`;
         <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-6">
           {t.checkout.summary}
         </h2>
-        <div className="flex gap-4 mb-6">
-          <img
+        <div className="flex flex-col gap-4">
+          <Image
             src={product.image}
             alt={product.name[lang]}
-            className="w-32 h-32 object-cover rounded-lg"
+            width={128}
+            height={128}
+            className="object-cover rounded-lg"
           />
           <div>
             <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-2">
@@ -93,15 +111,33 @@ Merci 🙏`;
               {product.price} DH
             </p>
             {product.selectedDesign && (
-              <p className="text-sm text-gray-600 dark:text-gray-400 mt-2">
-                Design: {product.selectedDesign.preview}{" "}
-                {product.selectedDesign.name}
-              </p>
+              <div className="flex items-center gap-2 mt-2">
+                <Image
+                  src={product.selectedDesign.preview}
+                  alt={product.selectedDesign.name}
+                  width={64}
+                  height={64}
+                  className="object-cover rounded-md"
+                />
+                <span className="text-sm text-gray-600 dark:text-gray-400">
+                  {product.selectedDesign.name}
+                </span>
+              </div>
             )}
+
             {product.uploadedImage && (
-              <p className="text-sm text-green-600 dark:text-green-400 mt-2">
-                ✓ Design personnalisé importé
-              </p>
+              <div className="flex items-center gap-2 mt-2">
+                <Image
+                  src={product.uploadedImage}
+                  alt="Design personnalisé"
+                  width={64}
+                  height={64}
+                  className="object-cover rounded-md"
+                />
+                <span className="text-sm text-green-600 dark:text-green-400">
+                  ✓ Design personnalisé importé
+                </span>
+              </div>
             )}
           </div>
         </div>
@@ -173,6 +209,7 @@ Merci 🙏`;
                 <option value="M">M</option>
                 <option value="L">L</option>
                 <option value="XL">XL</option>
+                <option value="XL">XXL</option>
               </select>
             </div>
 
@@ -219,7 +256,7 @@ Merci 🙏`;
 
             <button
               type="submit"
-              className="w-full py-4 bg-green-500 text-white rounded-lg font-semibold hover:bg-green-600 transition flex items-center justify-center gap-2"
+              className="w-full py-4 bg-green-500 text-white rounded-lg font-semibold hover:bg-green-600 transition flex items-center justify-center gap-2 cursor-pointer"
             >
               <MessageCircle className="w-6 h-6" />
               {t.checkout.form.submit}

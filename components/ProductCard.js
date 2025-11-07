@@ -52,22 +52,22 @@ export default function ProductCard({ product }) {
             <Image
               src={selectedDesign.preview}
               alt={selectedDesign.name}
-              width={128}
-              height={128}
-              className="object-cover rounded-md"
+              width={100}
+              height={100}
+              className="object-contain"
             />
           </div>
         )}
 
         {/* Overlay: uploaded custom design */}
         {uploadedImage && (
-          <div className="absolute inset-0 flex items-center justify-center bg-black bg-opacity-30 pointer-events-none">
+          <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
             <Image
               src={uploadedImage}
               alt="Custom design"
-              width={128}
-              height={128}
-              className="object-cover rounded-md"
+              width={100}
+              height={100}
+              className="object-contain"
             />
           </div>
         )}
@@ -88,6 +88,20 @@ export default function ProductCard({ product }) {
             {t.products.selectDesign}
           </p>
           <div className="flex gap-2">
+            {/* No Design Option */}
+            <button
+              onClick={() => {
+                setSelectedDesign(null);
+                setUploadedImage(null);
+              }}
+              className={`relative w-16 h-16 p-1 rounded-lg border-2 overflow-hidden cursor-pointer flex items-center justify-center text-xs font-medium ${
+                !selectedDesign && !uploadedImage
+                  ? "border-orange-500 bg-orange-50 dark:bg-orange-900"
+                  : "border-gray-300 dark:border-gray-600 hover:border-orange-300"
+              }`}
+            >
+              Aucun
+            </button>
             {product.designs.map((design) => (
               <button
                 key={design.id}
@@ -95,19 +109,21 @@ export default function ProductCard({ product }) {
                   setSelectedDesign(design);
                   setUploadedImage(null);
                 }}
-                className={`p-2 rounded-lg border-2 transition ${
+                className={`relative w-16 h-16 p-1 rounded-lg border-2 overflow-hidden cursor-pointer ${
                   selectedDesign?.id === design.id
-                    ? "border-orange-500 bg-orange-50 dark:bg-orange-900"
-                    : "border-gray-300 dark:border-gray-600 hover:border-orange-300"
+                    ? "border-orange-500"
+                    : "border-gray-300 hover:border-orange-300"
                 }`}
               >
-                <Image
-                  src={design.preview}
-                  alt={design.name}
-                  width={60}
-                  height={60}
-                  className="rounded-md object-cover"
-                />
+                <div className="relative w-full h-full rounded-md overflow-hidden">
+                  <Image
+                    src={design.preview}
+                    alt={design.name}
+                    fill
+                    className="object-cover"
+                    sizes="100vw"
+                  />
+                </div>
               </button>
             ))}
           </div>
@@ -132,7 +148,7 @@ export default function ProductCard({ product }) {
         {/* Order Button */}
         <button
           onClick={handleOrder}
-          className="w-full py-3 bg-orange-500 text-white rounded-lg font-semibold hover:bg-orange-600 transition"
+          className="w-full py-3 bg-orange-500 text-white rounded-lg font-semibold hover:bg-orange-600 transition cursor-pointer"
         >
           {t.products.orderNow}
         </button>

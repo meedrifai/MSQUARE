@@ -18,6 +18,27 @@ export const metadata = {
 export default function RootLayout({ children }) {
   return (
     <html lang="fr" suppressHydrationWarning>
+      <head>
+        {/* Prevent FOUC and hydration mismatch */}
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `
+              (function() {
+                try {
+                  const theme = localStorage.getItem('theme') || 'light';
+                  const lang = localStorage.getItem('lang') || 'fr';
+                  
+                  if (theme === 'dark') {
+                    document.documentElement.classList.add('dark');
+                  }
+                  
+                  document.documentElement.setAttribute('dir', lang === 'ar' ? 'rtl' : 'ltr');
+                } catch (e) {}
+              })();
+            `,
+          }}
+        />
+      </head>
       <body suppressHydrationWarning>
         <AppProvider>{children}</AppProvider>
       </body>

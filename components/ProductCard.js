@@ -11,6 +11,7 @@ export default function ProductCard({ product }) {
   const router = useRouter();
   const [selectedDesign, setSelectedDesign] = useState(null);
   const [uploadedImage, setUploadedImage] = useState(null);
+  const [selectedColor, setSelectedColor] = useState("black");
 
   // Handle user uploaded custom design
   const handleFileUpload = (e) => {
@@ -19,7 +20,7 @@ export default function ProductCard({ product }) {
       const reader = new FileReader();
       reader.onload = (e) => setUploadedImage(e.target.result);
       reader.readAsDataURL(file);
-      setSelectedDesign(null); // clear selected design if user uploads
+      setSelectedDesign(null);
     }
   };
 
@@ -29,48 +30,91 @@ export default function ProductCard({ product }) {
       ...product,
       selectedDesign,
       uploadedImage,
+      selectedColor,
     });
     router.push("/checkout");
   };
 
+  // Determine which image to show based on color and design
+  const getProductImage = () => {
+    // If user uploaded custom image, show base product with overlay
+    if (uploadedImage) {
+      return selectedColor === "black" ? product.image : product.imageWhite;
+    }
+
+    // If a design is selected, show the product with that design
+    if (selectedDesign) {
+      if (selectedColor === "black") {
+        return selectedDesign.imageBlack || product.image;
+      } else {
+        return selectedDesign.imageWhite || product.imageWhite;
+      }
+    }
+
+    // No design selected, show base product
+    return selectedColor === "black" ? product.image : product.imageWhite;
+  };
+
+  const productImage = getProductImage();
+
   return (
     <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-lg overflow-hidden transform hover:scale-105 transition duration-300 relative">
       {/* Product Image */}
-      <div className="relative w-full h-64">
+      <div className="relative w-full h-64 bg-gray-100 dark:bg-gray-700">
         <Image
-          src={product.image}
+          src={productImage}
           alt={product.name[lang]}
           fill
-          className="object-cover rounded-t-2xl"
-          sizes="100vw"
+          className="object-cover rounded-t-2xl transition-all duration-300"
+          sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
           priority
         />
 
-        {/* Overlay: selected design image */}
-        {selectedDesign && !uploadedImage && (
-          <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-            <Image
-              src={selectedDesign.preview}
-              alt={selectedDesign.name}
-              width={100}
-              height={100}
-              className="object-contain"
-            />
+        {/* Color Selector - Top Right */}
+        <div className="absolute top-3 right-3 flex gap-2 z-10">
+          <button
+            onClick={() => setSelectedColor("black")}
+            className={`w-8 h-8 rounded-full border-2 transition-all ${
+              selectedColor === "black"
+                ? "border-orange-500 ring-2 ring-orange-300 scale-110"
+                : "border-gray-300 hover:border-orange-300"
+            }`}
+            style={{ backgroundColor: "black" }}
+            title="Black"
+          ></button>
+          <button
+            onClick={() => setSelectedColor("white")}
+            className={`w-8 h-8 rounded-full border-2 transition-all ${
+              selectedColor === "white"
+                ? "border-orange-500 ring-2 ring-orange-300 scale-110"
+                : "border-gray-300 hover:border-orange-300"
+            }`}
+            style={{ backgroundColor: "white" }}
+            title="White"
+          ></button>
+        </div>
+
+        {/* Only show overlay for custom uploaded images */}
+        {uploadedImage && (
+          <div className="absolute inset-0 flex items-center justify-center pointer-events-none z-5">
+            <div className="relative w-32 h-32 md:w-40 md:h-40 drop-shadow-2xl">
+              <Image
+                src={uploadedImage}
+                alt="Custom design"
+                fill
+                className="object-contain"
+                sizes="200px"
+              />
+            </div>
           </div>
         )}
 
-        {/* Overlay: uploaded custom design */}
-        {uploadedImage && (
-          <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-            <Image
-              src={uploadedImage}
-              alt="Custom design"
-              width={100}
-              height={100}
-              className="object-contain"
-            />
+        {/* Badge showing selected design name */}
+        {/* {selectedDesign && (
+          <div className="absolute bottom-3 left-3 bg-black/70 backdrop-blur-sm text-white px-3 py-1 rounded-full text-xs font-semibold">
+            Design: {selectedDesign.name}
           </div>
-        )}
+        )} */}
       </div>
 
       {/* Product Info */}
@@ -87,21 +131,23 @@ export default function ProductCard({ product }) {
           <p className="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
             {t.products.selectDesign}
           </p>
-          <div className="flex gap-2">
-            {/* No Design Option */}
+          <div className="flex gap-2 flex-wrap">
+            {/* No Design Button */}
             <button
               onClick={() => {
                 setSelectedDesign(null);
                 setUploadedImage(null);
               }}
-              className={`relative w-16 h-16 p-1 rounded-lg border-2 overflow-hidden cursor-pointer flex items-center justify-center text-xs font-medium ${
+              className={`relative w-16 h-16 p-1 rounded-lg border-2 overflow-hidden cursor-pointer flex items-center justify-center text-xs font-medium transition-all ${
                 !selectedDesign && !uploadedImage
-                  ? "border-orange-500 bg-orange-50 dark:bg-orange-900"
-                  : "border-gray-300 dark:border-gray-600 hover:border-orange-300"
+                  ? "border-orange-500 bg-orange-50 dark:bg-orange-900/30 text-orange-600 dark:text-orange-400"
+                  : "border-gray-300 dark:border-gray-600 hover:border-orange-300 text-gray-600 dark:text-gray-400"
               }`}
             >
               Aucun
             </button>
+
+            {/* Design Options */}
             {product.designs.map((design) => (
               <button
                 key={design.id}
@@ -109,19 +155,24 @@ export default function ProductCard({ product }) {
                   setSelectedDesign(design);
                   setUploadedImage(null);
                 }}
-                className={`relative w-16 h-16 p-1 rounded-lg border-2 overflow-hidden cursor-pointer ${
+                className={`relative w-16 h-16 p-1 rounded-lg border-2 overflow-hidden cursor-pointer transition-all hover:scale-105 ${
                   selectedDesign?.id === design.id
-                    ? "border-orange-500"
-                    : "border-gray-300 hover:border-orange-300"
+                    ? "border-orange-500 ring-2 ring-orange-300"
+                    : "border-gray-300 dark:border-gray-600 hover:border-orange-300"
                 }`}
+                title={design.name}
               >
-                <div className="relative w-full h-full rounded-md overflow-hidden">
+                <div className="relative w-full h-full rounded-md overflow-hidden bg-gray-100 dark:bg-gray-700">
                   <Image
                     src={design.preview}
                     alt={design.name}
                     fill
                     className="object-cover"
-                    sizes="100vw"
+                    sizes="64px"
+                    onError={(e) => {
+                      console.error(`Failed to load image: ${design.preview}`);
+                      e.target.style.display = "none";
+                    }}
                   />
                 </div>
               </button>
@@ -131,7 +182,7 @@ export default function ProductCard({ product }) {
 
         {/* Upload Custom Design */}
         <div className="mb-4">
-          <label className="flex items-center justify-center gap-2 p-3 border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-lg cursor-pointer hover:border-orange-500 transition">
+          <label className="flex items-center justify-center gap-2 p-3 border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-lg cursor-pointer hover:border-orange-500 hover:bg-orange-50 dark:hover:bg-orange-900/10 transition">
             <Upload className="w-5 h-5 text-gray-600 dark:text-gray-400" />
             <span className="text-sm text-gray-600 dark:text-gray-400">
               {t.products.uploadDesign}
@@ -143,12 +194,17 @@ export default function ProductCard({ product }) {
               className="hidden"
             />
           </label>
+          {uploadedImage && (
+            <p className="text-xs text-gray-500 dark:text-gray-400 mt-2 text-center">
+              ✓ Custom design uploaded
+            </p>
+          )}
         </div>
 
         {/* Order Button */}
         <button
           onClick={handleOrder}
-          className="w-full py-3 bg-orange-500 text-white rounded-lg font-semibold hover:bg-orange-600 transition cursor-pointer"
+          className="w-full py-3 bg-gradient-to-r from-orange-500 to-orange-600 text-white rounded-lg font-semibold hover:from-orange-600 hover:to-orange-700 transition-all transform hover:scale-105 shadow-lg hover:shadow-xl"
         >
           {t.products.orderNow}
         </button>

@@ -55,7 +55,7 @@ export default function Header() {
               className="group flex items-center gap-3 cursor-pointer"
             >
               <div className="relative">
-                <div className="absolute inset-0 bg-linear-to-br from-orange-400 to-orange-600 rounded-xl blur-md opacity-50 group-hover:opacity-75 transition-opacity"></div>
+                <div className="absolute inset-0 bg-linear-to-r from-orange-400 to-orange-600 rounded-xl blur-md opacity-50 group-hover:opacity-75 transition-opacity"></div>
                 <Image
                   src={logo}
                   alt="MSquare Logo"
@@ -77,7 +77,7 @@ export default function Header() {
                   <button
                     key={item.id}
                     onClick={() => scrollToSection(item.id)}
-                    className="relative px-6 py-2 text-gray-700 dark:text-gray-300 font-semibold rounded-xl hover:text-orange-500 dark:hover:text-orange-400 transition-all duration-300 group"
+                    className="relative px-6 py-2 text-gray-700 dark:text-gray-300 font-semibold rounded-xl hover:text-orange-500 dark:hover:text-orange-400 transition-all duration-300 group cursor-pointer"
                   >
                     <span className="relative z-10">{item.label}</span>
                     <div className="absolute inset-0 bg-orange-100 dark:bg-orange-900/30 rounded-xl opacity-0 group-hover:opacity-100 transform scale-95 group-hover:scale-100 transition-all duration-300"></div>
@@ -91,7 +91,7 @@ export default function Header() {
               {/* Theme toggle */}
               <button
                 onClick={toggleTheme}
-                className="relative p-3 rounded-xl bg-gray-100 dark:bg-gray-800 hover:bg-orange-100 dark:hover:bg-orange-900/30 transition-all duration-300 group overflow-hidden"
+                className="relative p-3 rounded-xl bg-gray-100 dark:bg-gray-800 hover:bg-orange-100 dark:hover:bg-orange-900/30 transition-all duration-300 group overflow-hidden cursor-pointer"
               >
                 <div className="absolute inset-0 bg-linear-to-r from-orange-400 to-orange-600 opacity-0 group-hover:opacity-10 transition-opacity"></div>
                 {theme === "light" ? (
@@ -104,7 +104,7 @@ export default function Header() {
               {/* Language toggle */}
               <button
                 onClick={toggleLang}
-                className="relative px-5 py-3 rounded-xl bg-linear-to-r from-orange-500 to-orange-600 text-white font-bold hover:from-orange-600 hover:to-orange-700 transition-all duration-300 transform hover:scale-105 shadow-lg shadow-orange-500/30 overflow-hidden group"
+                className="relative px-5 py-3 rounded-xl bg-linear-to-r from-orange-500 to-orange-600 text-white font-bold hover:from-orange-600 hover:to-orange-700 transition-all duration-300 transform hover:scale-105 shadow-lg shadow-orange-500/30 overflow-hidden group cursor-pointer"
               >
                 <div className="absolute inset-0 bg-white/20 translate-y-full group-hover:translate-y-0 transition-transform duration-300"></div>
                 <span className="relative z-10">
@@ -116,7 +116,7 @@ export default function Header() {
               {isHome && (
                 <button
                   onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-                  className="lg:hidden p-3 rounded-xl bg-gray-100 dark:bg-gray-800 hover:bg-orange-100 dark:hover:bg-orange-900/30 transition-all"
+                  className="lg:hidden p-3 rounded-xl bg-gray-100 dark:bg-gray-800 hover:bg-orange-100 dark:hover:bg-orange-900/30 transition-all cursor-pointer"
                 >
                   {mobileMenuOpen ? (
                     <X className="w-5 h-5" />
@@ -150,7 +150,7 @@ export default function Header() {
         >
           {/* Backdrop */}
           <div
-            className="absolute inset-0 bg-black/60 backdrop-blur-sm"
+            className="absolute inset-0 bg-black/60 backdrop-blur-sm cursor-pointer"
             onClick={() => setMobileMenuOpen(false)}
           ></div>
 
@@ -167,11 +167,9 @@ export default function Header() {
                 <button
                   key={item.id}
                   onClick={() => scrollToSection(item.id)}
-                  className="w-full text-left px-6 py-4 text-gray-700 dark:text-gray-300 font-semibold rounded-xl hover:bg-orange-50 dark:hover:bg-orange-900/30 hover:text-orange-500 transition-all duration-300 transform hover:translate-x-2"
+                  className="w-full text-left px-6 py-4 text-gray-700 dark:text-gray-300 font-semibold rounded-xl hover:bg-orange-50 dark:hover:bg-orange-900/30 hover:text-orange-500 transition-all duration-300 transform hover:translate-x-2 animate-slideIn cursor-pointer"
                   style={{
-                    animation: mobileMenuOpen
-                      ? `slideIn 0.3s ease-out ${index * 0.1}s both`
-                      : "none",
+                    animationDelay: `${index * 0.1}s`,
                   }}
                 >
                   {item.label}
@@ -181,19 +179,6 @@ export default function Header() {
           </div>
         </div>
       )}
-
-      <style jsx>{`
-        @keyframes slideIn {
-          from {
-            opacity: 0;
-            transform: translateX(-20px);
-          }
-          to {
-            opacity: 1;
-            transform: translateX(0);
-          }
-        }
-      `}</style>
     </>
   );
 }
